@@ -9,6 +9,7 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -29,25 +30,30 @@ import org.springframework.security.web.savedrequest.SavedRequest;
 
 @Configuration
 @EnableWebSecurity
+@Order(0)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
-	@Autowired UserDetailsService userDetailsService;
-
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
-				.authorizeRequests()
-				.anyRequest().authenticated();
-		http
-				.formLogin()
-				;
-
-		http
-				.csrf().disable();
-
-
-
+				.antMatcher("/admin/**")
+				.authorizeHttpRequests()
+				.anyRequest().authenticated()
+		.and()
+				.httpBasic();
 	}
+}
 
+@Configuration
+@Order(1)
+class SecurityConfig2 extends WebSecurityConfigurerAdapter {
+
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http
+				.authorizeHttpRequests()
+				.anyRequest().permitAll()
+				.and()
+				.formLogin();
+	}
 }
