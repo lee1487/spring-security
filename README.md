@@ -18,7 +18,22 @@ FilterChainProxy
   필터들은 Chain으로 연결되어 있어서 사용자의 요청을 필터 순서대로 호출하여 전달하게 된다.
   물론 사용자 정의 필터를 생성해서 기존의 필터 전, 후로 추가할 수 있다.
   마지막 필터까지 인증 및 인가 예외가 발생하지 않으면 보안이 통과하게 된다. 즉, Dispatcher Servlet으로 넘어가게 된다.
-  
+
   참조
   https://velog.io/@gmtmoney2357/%EC%8A%A4%ED%94%84%EB%A7%81-%EC%8B%9C%ED%81%90%EB%A6%AC%ED%8B%B0-FilterChainProxy-%EB%8B%A4%EC%A4%91-%EC%84%A4%EC%A0%95-%ED%81%B4%EB%9E%98%EC%8A%A4
+
+Authentication
+  - 당신이 누구인지 증명하는것
+    - 사용자의 인증정보를 저장하는 토큰 개념으로 인증시 id와 passowrd를 가지고 인증 검증을 위해 전달되어 사용된다.
+      인증후 최종 인증 결과(user 객체, 권한 정보)를 담고 SecurityContext에 저장되어
+      전역적으로 참조가 가능하다.
+    - Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+  - 구조
+    - principal: 사용자 아이디 또는 User 객체를 저장
+    - credentials: 사용자 비밀번호
+    - authorities: 인증된 사용자의 권한 목록
+    - details: 인증 부가 정보
+    - Authenticated: 인증 여부
 ```
+
+
