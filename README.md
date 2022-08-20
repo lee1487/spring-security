@@ -34,6 +34,23 @@ Authentication
     - authorities: 인증된 사용자의 권한 목록
     - details: 인증 부가 정보
     - Authenticated: 인증 여부
+
+SecurityContextPersistenceFilter
+  - SecurityContext 객체의 생성, 저장, 조회
+
+  - 익명 사용자
+    - 새로운 SecurityContext 객체를 생성하여 SecurityContextHolder 에 저장
+    - AnonymousAuthenticationFilter 에서 AnonymousAuthenticationToken 객체를 SecurityContext 에 저장
+  - 인증 시
+    - 새로운 SecurityContext 객체를 생성하여 SecurityContextHolder 에 저장
+    - UsernamePasswordAuthenticationFilter 에서 인증 성공 후 SecurityContext에 UsernamePasswordAuthentication 객체를
+      SecurityContext 에 저장
+    - 인증이 최종 완료되면 Session에 SecurityContext를 저장
+  - 인증 후
+    - Session 에서 SecurityContext 꺼내어 SecurityContextHolder 에서 저장
+    - SecurityContext 안에 Authentication 객체가 존재하면 계속 인증을 유지한다
+  - 최종 응답 시 공통
+    - SecurityContextHolder.clearContext()
 ```
 
 
