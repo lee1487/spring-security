@@ -51,6 +51,10 @@ SecurityContextPersistenceFilter
     - SecurityContext 안에 Authentication 객체가 존재하면 계속 인증을 유지한다
   - 최종 응답 시 공통
     - SecurityContextHolder.clearContext()
+
+Authentication Flow
+  - Client -> UsernamePasswordAuthenticationFilter -> AuthenticationManager
+    -> AuthenticationProvider -> UserDetailsService -> Repository
 ```
 
 
