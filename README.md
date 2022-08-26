@@ -107,6 +107,8 @@ AccessDecisionManager
      - ACCESS_DENIED: 접근 거부(0)
      - ACCESS_ABSTAIN: 접근 보류(-1)
        - Voter가 해당 타입의 요청에 대해 결정을 내릴 수 없는 경우
+
+스프링 시큐리티 아키텍처 
 ```
 
 
