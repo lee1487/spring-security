@@ -33,7 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 
 	@Bean
-    private AuthenticationProvider authenticationProvider() {
+    public AuthenticationProvider authenticationProvider() {
 		return new CustomAuthenticationProvider();
 	}
 
@@ -44,20 +44,25 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-    	web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+    	web.ignoring().antMatchers("/favicon.ico", "/resources/**", "/error");
     }
 
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/", "/users").permitAll()
+                .antMatchers("/", "/users", "user/login/**").permitAll()
                 .antMatchers("/mypage").hasRole("USER")
                 .antMatchers("/messages").hasRole("MANAGER")
                 .antMatchers("/config").hasRole("ADMIN")
                 .anyRequest().authenticated()
 
         .and()
-                .formLogin();
+                .formLogin()
+                .loginPage("/login")
+                .loginProcessingUrl("/login_proc")
+                .defaultSuccessUrl("/")
+                .permitAll()
+                ;
     }
 }
