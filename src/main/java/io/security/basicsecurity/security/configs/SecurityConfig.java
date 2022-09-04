@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import io.security.basicsecurity.security.provider.CustomAuthenticationProvider;
 
@@ -25,8 +26,8 @@ import io.security.basicsecurity.security.provider.CustomAuthenticationProvider;
 @Slf4j
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-	@Autowired
-	private AuthenticationDetailsSource authenticationDetailsSource;
+	@Autowired private AuthenticationDetailsSource authenticationDetailsSource;
+	@Autowired private AuthenticationSuccessHandler customAuthenticationSuccessHandler;
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -64,6 +65,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .loginProcessingUrl("/login_proc")
                 .authenticationDetailsSource(authenticationDetailsSource)
                 .defaultSuccessUrl("/")
+                .successHandler(customAuthenticationSuccessHandler)
                 .permitAll()
                 ;
     }
