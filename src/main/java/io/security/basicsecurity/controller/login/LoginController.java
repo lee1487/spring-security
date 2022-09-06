@@ -11,6 +11,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import io.security.basicsecurity.domain.Account;
+
 @Controller
 public class LoginController {
 
@@ -32,6 +34,17 @@ public class LoginController {
 		}
 
 		return "redirect:/login";
+	}
+
+	@GetMapping("/denied")
+	public String accessDenied(@RequestParam(value = "exception", required = false) String exception, Model model) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		Account account = (Account) authentication.getPrincipal();
+		model.addAttribute("username", account.getUsername());
+		model.addAttribute("exception", exception);
+
+		return "user/login/denied";
+
 	}
 
 }

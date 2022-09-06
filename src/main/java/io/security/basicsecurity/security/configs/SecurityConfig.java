@@ -8,18 +8,23 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.ExceptionHandlingConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
+import io.security.basicsecurity.security.common.FormAuthenticationDetailsSource;
+import io.security.basicsecurity.security.handler.CustomAccessDeniedHandler;
 import io.security.basicsecurity.security.provider.CustomAuthenticationProvider;
 
 @Configuration
@@ -27,7 +32,7 @@ import io.security.basicsecurity.security.provider.CustomAuthenticationProvider;
 @Slf4j
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-	@Autowired private AuthenticationDetailsSource authenticationDetailsSource;
+	@Autowired private FormAuthenticationDetailsSource  authenticationDetailsSource;
 	@Autowired private AuthenticationSuccessHandler customAuthenticationSuccessHandler;
 	@Autowired private AuthenticationFailureHandler customAuthenticationFailureHandler;
 
@@ -69,7 +74,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .defaultSuccessUrl("/")
                 .successHandler(customAuthenticationSuccessHandler)
                 .failureHandler(customAuthenticationFailureHandler)
+
                 .permitAll()
-                ;
+        .and()
+        		.exceptionHandling()
+        		.accessDeniedHandler(accessDeniedHandler());
+
     }
+
+    @Bean
+	public AccessDeniedHandler accessDeniedHandler() {
+    	CustomAccessDeniedHandler accessDeniedHandler = new CustomAccessDeniedHandler();
+    	accessDeniedHandler.setErrorPage("/denied");
+		return accessDeniedHandler;
+	}
 }
