@@ -2,6 +2,7 @@ package io.security.basicsecurity.security.provider;
 
 import io.security.basicsecurity.security.common.FormWebAuthenticationDetails;
 import io.security.basicsecurity.security.service.AccountContext;
+import io.security.basicsecurity.security.token.AjaxAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -35,17 +36,11 @@ public class AjaxAuthenticationProvider implements AuthenticationProvider {
             throw new BadCredentialsException("Invalid Password");
         }
 
-        String secretKey = ( (FormWebAuthenticationDetails) authentication.getDetails() ).getSecretKey();
-
-        if(secretKey == null || ! secretKey.equals("secret")) {
-            throw new IllegalArgumentException("invalid Secret");
-        }
-
-        return new UsernamePasswordAuthenticationToken(accountContext.getAccount(), null, accountContext.getAuthorities());
+        return new AjaxAuthenticationToken(accountContext.getAccount(), null, accountContext.getAuthorities());
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return authentication.equals(UsernamePasswordAuthenticationToken.class);
+        return authentication.equals(AjaxAuthenticationToken.class);
     }
 }

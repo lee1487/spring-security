@@ -40,6 +40,7 @@ public class AjaxSecurityConfig extends WebSecurityConfigurerAdapter {
 
     protected AjaxLoginProcessingFilter ajaxLoginProcessingFilter() throws Exception {
         AjaxLoginProcessingFilter filter = new AjaxLoginProcessingFilter();
+
         filter.setAuthenticationManager(authenticationManagerBean());
         return filter;
     }
