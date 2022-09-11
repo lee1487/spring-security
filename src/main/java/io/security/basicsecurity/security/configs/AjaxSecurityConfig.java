@@ -1,6 +1,8 @@
 package io.security.basicsecurity.security.configs;
 
 import io.security.basicsecurity.security.filter.AjaxLoginProcessingFilter;
+import io.security.basicsecurity.security.handler.AjaxAuthenticationFailureHandler;
+import io.security.basicsecurity.security.handler.AjaxAuthenticationSuccessHandler;
 import io.security.basicsecurity.security.provider.AjaxAuthenticationProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,8 +42,10 @@ public class AjaxSecurityConfig extends WebSecurityConfigurerAdapter {
 
     protected AjaxLoginProcessingFilter ajaxLoginProcessingFilter() throws Exception {
         AjaxLoginProcessingFilter filter = new AjaxLoginProcessingFilter();
-
         filter.setAuthenticationManager(authenticationManagerBean());
+
+        filter.setAuthenticationSuccessHandler(ajaxAuthenticationSuccessHandler());
+        filter.setAuthenticationFailureHandler(ajaxAuthenticationFailureHandler());
         return filter;
     }
 
@@ -53,5 +57,15 @@ public class AjaxSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
+    @Bean
+    public AjaxAuthenticationSuccessHandler ajaxAuthenticationSuccessHandler() {
+        return new AjaxAuthenticationSuccessHandler();
+    }
+
+    @Bean
+    public AjaxAuthenticationFailureHandler ajaxAuthenticationFailureHandler() {
+        return new AjaxAuthenticationFailureHandler();
     }
 }
