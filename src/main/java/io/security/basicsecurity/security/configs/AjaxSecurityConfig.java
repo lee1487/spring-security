@@ -1,6 +1,8 @@
 package io.security.basicsecurity.security.configs;
 
+import io.security.basicsecurity.security.common.AjaxLoginAuthenticationEntryPoint;
 import io.security.basicsecurity.security.filter.AjaxLoginProcessingFilter;
+import io.security.basicsecurity.security.handler.AjaxAccessDeniedHandler;
 import io.security.basicsecurity.security.handler.AjaxAuthenticationFailureHandler;
 import io.security.basicsecurity.security.handler.AjaxAuthenticationSuccessHandler;
 import io.security.basicsecurity.security.provider.AjaxAuthenticationProvider;
@@ -13,6 +15,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -30,14 +33,24 @@ public class AjaxSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .antMatcher("/api/**")
                 .authorizeRequests()
+                .antMatchers("/api/messages").hasRole("MANAGER")
                 .antMatchers("/api/login").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(ajaxLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
         ;
 
+        http
+                .exceptionHandling()
+                .authenticationEntryPoint(new AjaxLoginAuthenticationEntryPoint())
+                .accessDeniedHandler(ajaxDeniedHandler());
+
         http.csrf().disable();
 
+    }
+
+    public AccessDeniedHandler ajaxDeniedHandler() {
+        return new AjaxAccessDeniedHandler();
     }
 
     protected AjaxLoginProcessingFilter ajaxLoginProcessingFilter() throws Exception {
