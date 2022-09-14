@@ -19,8 +19,8 @@ public final class AjaxLoginConfigurer<H extends HttpSecurityBuilder<H>> extends
     private AuthenticationFailureHandler failureHandler;
     private AuthenticationManager authenticationManager;
 
-    public AjaxLoginConfigurer() {
-        super(new AjaxLoginProcessingFilter(), "/api/login");
+    public AjaxLoginConfigurer(String defaultLoginProcessingUrl) {
+        super(new AjaxLoginProcessingFilter(), defaultLoginProcessingUrl);
     }
 
     @Override
