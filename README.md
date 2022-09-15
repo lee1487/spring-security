@@ -108,7 +108,10 @@ AccessDecisionManager
      - ACCESS_ABSTAIN: 접근 보류(-1)
        - Voter가 해당 타입의 요청에 대해 결정을 내릴 수 없는 경우
 
-스프링 시큐리티 아키텍처 
+스프링 시큐리티 아키텍처
+
+7) Ajax 로그인 구현 & CSRF 설정 진행중 /login이 호출되는 에러 발생
+  - 해당 문제 해결을 위해 git stash로 진행한 내용 삭제 후 원인 파악 예정
 ```
 
 
