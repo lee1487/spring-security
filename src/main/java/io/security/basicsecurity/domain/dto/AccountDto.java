@@ -1,4 +1,4 @@
-package io.security.basicsecurity.domain;
+package io.security.basicsecurity.domain.dto;
 
 import lombok.Data;
 

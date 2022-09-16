@@ -1,5 +1,7 @@
 package io.security.basicsecurity.security.provider;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -11,50 +13,43 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import io.security.basicsecurity.security.common.FormWebAuthenticationDetails;
 import io.security.basicsecurity.security.service.AccountContext;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class FormAuthenticationProvider implements AuthenticationProvider {
 
-	@Autowired
-	private UserDetailsService userDetailsService;
+    @Autowired
+    private UserDetailsService userDetailsService;
 
-	@Autowired
-	private PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
-	public FormAuthenticationProvider(PasswordEncoder passwordEncoder) {
-		this.passwordEncoder = passwordEncoder;
-	}
+    public FormAuthenticationProvider(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
 
-	@Override
-	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-		String username = authentication.getName();
-		String password = (String) authentication.getCredentials();
+    @Override
+    @Transactional
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 
-		AccountContext accountContext = (AccountContext) userDetailsService.loadUserByUsername(username);
+        String loginId = authentication.getName();
+        String password = (String) authentication.getCredentials();
 
-		if(!passwordEncoder.matches(password, accountContext.getAccount().getPassword())) {
-			throw new BadCredentialsException("Invalid Password");
-//      throw new BadCredentialsException("BadCredentialsException");
-		}
+        AccountContext accountContext = (AccountContext)userDetailsService.loadUserByUsername(loginId);
 
-		String secretKey = ( (FormWebAuthenticationDetails) authentication.getDetails() ).getSecretKey();
-//    FormWebAuthenticationDetails formWebAuthenticationDetails = (FormWebAuthenticationDetails) authentication.getDetails();
-//    String secretKey = formWebAuthenticationDetails.getSecretKey();
+        if (!passwordEncoder.matches(password, accountContext.getPassword())) {
+            throw new BadCredentialsException("Invalid password");
+        }
 
-		if(secretKey == null || ! secretKey.equals("secret")) {
-//    if(secretKey == null || !"secret".equals(secretKey)) {
-			throw new IllegalArgumentException("invalid Secret");
-//      throw new InsufficientAuthenticationException("InsufficientAuthenticationException");
-		}
+        String secretKey = ((FormWebAuthenticationDetails) authentication.getDetails()).getSecretKey();
+        if (secretKey == null || !secretKey.equals("secret")) {
+            throw new IllegalArgumentException("Invalid Secret");
+        }
 
-		return new UsernamePasswordAuthenticationToken(accountContext.getAccount(), null, accountContext.getAuthorities());
-//    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(accountContext.getAccount(), null, accountContext.getAuthorities());
-//    return authenticationToken;
-	}
+        return new UsernamePasswordAuthenticationToken(accountContext.getAccount(), null, accountContext.getAuthorities());
+    }
 
-	@Override
-	public boolean supports(Class<?> authentication) {
-		return authentication.equals(UsernamePasswordAuthenticationToken.class);
-//    return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
-	}
-
+    @Override
+    public boolean supports(Class<?> authentication) {
+        return authentication.equals(UsernamePasswordAuthenticationToken.class);
+    }
 }

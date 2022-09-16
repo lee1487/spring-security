@@ -7,8 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 
 public class AjaxAuthenticationToken extends AbstractAuthenticationToken {
 
-
-	private final Object principal;
+    private final Object principal;
     private Object credentials;
 
     public AjaxAuthenticationToken(Object principal, Object credentials) {
@@ -22,7 +21,7 @@ public class AjaxAuthenticationToken extends AbstractAuthenticationToken {
         super(authorities);
         this.principal = principal;
         this.credentials = credentials;
-        super.setAuthenticated(true);
+        setAuthenticated(true);
     }
 
     @Override

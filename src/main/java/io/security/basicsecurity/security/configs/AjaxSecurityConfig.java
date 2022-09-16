@@ -39,40 +39,37 @@ public class AjaxSecurityConfig extends WebSecurityConfigurerAdapter {
         .and()
                 .exceptionHandling()
                 .authenticationEntryPoint(new AjaxLoginAuthenticationEntryPoint())
-                .accessDeniedHandler(ajaxDeniedHandler())
-        .and()
-                .addFilterBefore(ajaxLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class);
-
-
+                .accessDeniedHandler(ajaxAccessDeniedHandler())
+//                .and()
+//                .addFilterBefore(ajaxLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
+        ;
         http.csrf().disable();
-        customConfigureAjax(http);
 
-
-
+        customConfigurerAjax(http);
     }
 
-    private void customConfigureAjax(HttpSecurity http) throws Exception {
+    private void customConfigurerAjax(HttpSecurity http) throws Exception {
         http
-                .apply(new AjaxLoginConfigurer<>("/api/login"))
+                .apply(new AjaxLoginConfigurer<>())
                 .successHandlerAjax(ajaxAuthenticationSuccessHandler())
                 .failureHandlerAjax(ajaxAuthenticationFailureHandler())
-                .loginPage("/api/login")
-                .loginProcessingUrl("/api/login")
-                .setAuthenticationManager(authenticationManagerBean());
+                .setAuthenticationManager(authenticationManagerBean())
+                .loginProcessingUrl("/api/login");
     }
 
-    public AccessDeniedHandler ajaxDeniedHandler() {
+    @Bean
+    public AccessDeniedHandler ajaxAccessDeniedHandler() {
         return new AjaxAccessDeniedHandler();
     }
 
-    protected AjaxLoginProcessingFilter ajaxLoginProcessingFilter() throws Exception {
-        AjaxLoginProcessingFilter filter = new AjaxLoginProcessingFilter();
-        filter.setAuthenticationManager(authenticationManagerBean());
-
-        filter.setAuthenticationSuccessHandler(ajaxAuthenticationSuccessHandler());
-        filter.setAuthenticationFailureHandler(ajaxAuthenticationFailureHandler());
-        return filter;
-    }
+//    public AjaxLoginProcessingFilter ajaxLoginProcessingFilter() throws Exception {
+//
+//        AjaxLoginProcessingFilter filter = new AjaxLoginProcessingFilter();
+//        filter.setAuthenticationManager(authenticationManagerBean());
+//        filter.setAuthenticationSuccessHandler(ajaxAuthenticationSuccessHandler());
+//        filter.setAuthenticationFailureHandler(ajaxAuthenticationFailureHandler());
+//        return filter;
+//    }
 
     @Bean
     public AuthenticationProvider ajaxAuthenticationProvider(){
@@ -80,17 +77,17 @@ public class AjaxSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
-
-    @Bean
-    public AjaxAuthenticationSuccessHandler ajaxAuthenticationSuccessHandler() {
+    public AjaxAuthenticationSuccessHandler ajaxAuthenticationSuccessHandler(){
         return new AjaxAuthenticationSuccessHandler();
     }
 
     @Bean
-    public AjaxAuthenticationFailureHandler ajaxAuthenticationFailureHandler() {
+    public AjaxAuthenticationFailureHandler ajaxAuthenticationFailureHandler(){
         return new AjaxAuthenticationFailureHandler();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 }

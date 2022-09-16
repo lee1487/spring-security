@@ -1,8 +1,11 @@
 package io.security.basicsecurity.controller.login;
 
+import java.security.Principal;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
@@ -11,7 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import io.security.basicsecurity.domain.Account;
+import io.security.basicsecurity.domain.entity.Account;
 
 @Controller
 public class LoginController {
@@ -21,10 +24,10 @@ public class LoginController {
 			@RequestParam(value = "exception", required = false) String exception, Model model) {
 		model.addAttribute("error", error);
 		model.addAttribute("exception", exception);
-		return "user/login/login";
+		return "login";
 	}
 
-	@GetMapping("logout")
+	@GetMapping("/logout")
 	public String logout(HttpServletRequest request, HttpServletResponse response) {
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -36,15 +39,16 @@ public class LoginController {
 		return "redirect:/login";
 	}
 
-	@GetMapping("/denied")
-	public String accessDenied(@RequestParam(value = "exception", required = false) String exception, Model model) {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		Account account = (Account) authentication.getPrincipal();
-		model.addAttribute("username", account.getUsername());
-		model.addAttribute("exception", exception);
+	@GetMapping(value="/denied")
+	public String accessDenied(@RequestParam(value = "exception", required = false) String exception, Principal principal, Model model) throws Exception {
+
+		if (principal instanceof UsernamePasswordAuthenticationToken) {
+			Account account = (Account) ((UsernamePasswordAuthenticationToken) principal).getPrincipal();
+			model.addAttribute("username", account.getUsername());
+			model.addAttribute("exception", exception);
+		}
 
 		return "user/login/denied";
-
 	}
 
 }

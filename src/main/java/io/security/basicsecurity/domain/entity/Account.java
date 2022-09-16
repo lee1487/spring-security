@@ -1,4 +1,4 @@
-package io.security.basicsecurity.domain;
+package io.security.basicsecurity.domain.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

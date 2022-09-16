@@ -3,6 +3,7 @@ package io.security.basicsecurity.security.configs;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -19,78 +20,75 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
-import io.security.basicsecurity.security.common.FormAuthenticationDetailsSource;
-import io.security.basicsecurity.security.handler.CustomAccessDeniedHandler;
+import io.security.basicsecurity.security.common.FormWebAuthenticationDetailsSource;
+import io.security.basicsecurity.security.handler.FormAccessDeniedHandler;
 import io.security.basicsecurity.security.provider.FormAuthenticationProvider;
 
 @Configuration
 @EnableWebSecurity
 @Slf4j
-@Order(1)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-	@Autowired private FormAuthenticationDetailsSource  authenticationDetailsSource;
-	@Autowired private AuthenticationSuccessHandler customAuthenticationSuccessHandler;
-	@Autowired private AuthenticationFailureHandler customAuthenticationFailureHandler;
-
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.authenticationProvider(authenticationProvider());
-	}
-
-	@Override
-	public AuthenticationManager authenticationManagerBean() throws Exception {
-		return super.authenticationManagerBean();
-	}
-
-	@Bean
-    public AuthenticationProvider authenticationProvider() {
-		return new FormAuthenticationProvider(passwordEncoder());
-	}
-
-	@Bean
-    public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
+    @Autowired
+    private FormWebAuthenticationDetailsSource formWebAuthenticationDetailsSource;
+    @Autowired
+    private AuthenticationSuccessHandler formAuthenticationSuccessHandler;
+    @Autowired
+    private AuthenticationFailureHandler formAuthenticationFailureHandler;
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-    	web.ignoring().antMatchers("/favicon.ico", "/resources/**", "/error");
+        web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(authenticationProvider());
+    }
+
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
     }
 
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/", "/users", "user/login/**", "/login*").permitAll()
                 .antMatchers("/mypage").hasRole("USER")
                 .antMatchers("/messages").hasRole("MANAGER")
                 .antMatchers("/config").hasRole("ADMIN")
+                .antMatchers("/**").permitAll()
                 .anyRequest().authenticated()
-
         .and()
                 .formLogin()
                 .loginPage("/login")
                 .loginProcessingUrl("/login_proc")
-                .authenticationDetailsSource(authenticationDetailsSource)
-                .defaultSuccessUrl("/")
-                .successHandler(customAuthenticationSuccessHandler)
-                .failureHandler(customAuthenticationFailureHandler)
-
+                .authenticationDetailsSource(formWebAuthenticationDetailsSource)
+                .successHandler(formAuthenticationSuccessHandler)
+                .failureHandler(formAuthenticationFailureHandler)
                 .permitAll()
         .and()
-        		.exceptionHandling()
-        		.accessDeniedHandler(accessDeniedHandler());
-
-
+                .exceptionHandling()
+                .accessDeniedPage("/denied")
+                .accessDeniedHandler(accessDeniedHandler())
+        ;
     }
 
     @Bean
-	public AccessDeniedHandler accessDeniedHandler() {
-    	CustomAccessDeniedHandler accessDeniedHandler = new CustomAccessDeniedHandler();
-    	accessDeniedHandler.setErrorPage("/denied");
-		return accessDeniedHandler;
-	}
+    public PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
 
+    @Bean
+    public AuthenticationProvider authenticationProvider(){
+        return new FormAuthenticationProvider(passwordEncoder());
+    }
+
+    public AccessDeniedHandler accessDeniedHandler() {
+        FormAccessDeniedHandler commonAccessDeniedHandler = new FormAccessDeniedHandler();
+        commonAccessDeniedHandler.setErrorPage("/denied");
+        return commonAccessDeniedHandler;
+    }
 
 }
