@@ -18,7 +18,7 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import io.security.basicsecurity.security.configs.SecurityConfig;
 
-public class UrlFilterInvocationSecurityMetadatsSource implements FilterInvocationSecurityMetadataSource {
+public class UrlFilterInvocationSecurityMetadataSource implements FilterInvocationSecurityMetadataSource {
 
     private LinkedHashMap<RequestMatcher, List<ConfigAttribute>> requestMap = new LinkedHashMap<>();
 
@@ -26,8 +26,6 @@ public class UrlFilterInvocationSecurityMetadatsSource implements FilterInvocati
     public Collection<ConfigAttribute> getAttributes(Object object) throws IllegalArgumentException {
 
         HttpServletRequest request = ((FilterInvocation) object).getRequest();
-
-        requestMap.put(new AntPathRequestMatcher("/mypage"), Arrays.asList(new SecurityConfig("ROLE_USER")));
 
         if(requestMap != null){
             for(Map.Entry<RequestMatcher, List<ConfigAttribute>> entry : requestMap.entrySet()){
